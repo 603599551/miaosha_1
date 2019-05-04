@@ -19,7 +19,7 @@ public class Result<T> {
     }
 
     /**
-     * 成功时的调用
+     * 成功时的调用 testGit
      * @param data
      * @param <T>
      * @return
