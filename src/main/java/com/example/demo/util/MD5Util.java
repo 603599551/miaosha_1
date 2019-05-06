@@ -18,7 +18,7 @@ public class MD5Util {
      * @return
      */
     public static String inputPwdToFormPwd(String inputPwd){
-        String str= ""+ salt + inputPwd;
+        String str= ""+salt.charAt(0)+salt.charAt(2) + inputPwd +salt.charAt(5) + salt.charAt(4);
         return md5(str);
     }
 
@@ -30,7 +30,7 @@ public class MD5Util {
      * @return
      */
     public static String formPwdToDBPwd(String formPwd,String salt){
-        String str= ""+ salt + formPwd;
+        String str= ""+salt.charAt(0)+salt.charAt(2) + formPwd +salt.charAt(5) + salt.charAt(4);
         return md5(str);
     }
 
