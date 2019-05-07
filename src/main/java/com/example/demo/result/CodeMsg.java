@@ -10,7 +10,11 @@ public class CodeMsg {
     //登录模块 5002XX
     public static CodeMsg SESSION_ERROR=new CodeMsg(500210,"session不存在或已失效");
     public static CodeMsg PASSWORD_EMPTY=new CodeMsg(500211,"登录密码不能为空");
+    public static CodeMsg PASSWORD_ERROR=new CodeMsg(500215,"登录密码错误");
     public static CodeMsg MOBILE_EMPTY=new CodeMsg(500212,"手机号不能为空");
+    public static CodeMsg MOBILE_ERROR=new CodeMsg(500213,"手机号格式错误");
+    public static CodeMsg MOBILE_NOT_EXIST=new CodeMsg(500214,"手机号不存在");
+
     //商品模块 5003XX
 
     //订单模块 5004XX
