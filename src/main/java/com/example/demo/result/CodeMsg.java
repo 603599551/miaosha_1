@@ -8,7 +8,9 @@ public class CodeMsg {
     public static CodeMsg SUCCESS=new CodeMsg(0,"success");
     public static CodeMsg SERVER_ERROR =new CodeMsg(500100,"server error");
     //登录模块 5002XX
-
+    public static CodeMsg SESSION_ERROR=new CodeMsg(500210,"session不存在或已失效");
+    public static CodeMsg PASSWORD_EMPTY=new CodeMsg(500211,"登录密码不能为空");
+    public static CodeMsg MOBILE_EMPTY=new CodeMsg(500212,"手机号不能为空");
     //商品模块 5003XX
 
     //订单模块 5004XX
