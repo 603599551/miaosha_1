@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dao.MiaoshaUserDao;
 import com.example.demo.domain.MiaoshaUser;
+import com.example.demo.exception.GlobalException;
 import com.example.demo.result.CodeMsg;
 import com.example.demo.util.MD5Util;
 import com.example.demo.vo.LoginVo;
@@ -19,10 +20,10 @@ public class MiaoshaUserService {
         return miaoshaUserDao.getById(id);
     }
 
-    public CodeMsg login(LoginVo loginVo) {
+    public boolean login(LoginVo loginVo) {
 
         if(loginVo==null){
-            return CodeMsg.SERVER_ERROR;
+            throw new GlobalException(CodeMsg.SERVER_ERROR);
         }
 
         String mobile=loginVo.getMobile();
@@ -31,16 +32,16 @@ public class MiaoshaUserService {
         //判断手机号是否存在
         MiaoshaUser user=getById(Long.parseLong(mobile));
         if(user==null){
-            return CodeMsg.MOBILE_NOT_EXIST;
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
         }
         //验证密码
         String dbPwd=user.getPassword();
         String saltDB=user.getSalt();
         String calPwd= MD5Util.formPwdToDBPwd(formPwd,saltDB);
         if(!StringUtils.equals(calPwd,dbPwd)){
-            return CodeMsg.PASSWORD_ERROR;
+            throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }
 
-        return CodeMsg.SUCCESS;
+        return true;
     }
 }
