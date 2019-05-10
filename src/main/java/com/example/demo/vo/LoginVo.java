@@ -4,6 +4,7 @@ import com.example.demo.validator.IsMobile;
 import org.hibernate.validator.constraints.Length;
 
 import javax.validation.constraints.NotNull;
+import java.nio.channels.Selector;
 import java.util.Arrays;
 
 public class LoginVo {
@@ -13,7 +14,7 @@ public class LoginVo {
     private String mobile;
 
     @NotNull
-    @Length(min=32)
+    @Length(min=6)
     private String password;
 
     public String getMobile() {
