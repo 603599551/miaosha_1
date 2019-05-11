@@ -13,6 +13,7 @@ public class MD5Util {
     private static final String salt="1a2b3c4d";
 
     /**
+     * @deprecated 用户端 采用js提供的MD5算法，不用本方法
      * 第一次MD5 用户端：PASSWORD1=MD5(密码明文+固定salt)
      * @param inputPwd
      * @return
@@ -34,16 +35,21 @@ public class MD5Util {
         return md5(str);
     }
 
-    /**
-     * 两次MD5
-     * @param inputPwd
-     * @param saltDB
-     * @return
-     */
-    public static String inputPwdToDBPwd(String inputPwd,String saltDB){
-        String formPwd=inputPwdToFormPwd(inputPwd);
-        String dbPwd=formPwdToDBPwd(formPwd,saltDB);
-        return dbPwd;
-    }
+//    /**
+//     * 两次MD5
+//     * @param inputPwd
+//     * @param saltDB
+//     * @return
+//     */
+//    public static String inputPwdToDBPwd(String inputPwd,String saltDB){
+//        String formPwd=inputPwdToFormPwd(inputPwd);
+//        String dbPwd=formPwdToDBPwd(formPwd,saltDB);
+//        return dbPwd;
+//    }
 
+    public static void main(String []args){
+//        System.out.println(inputPwdToFormPwd("123456"));
+//        System.out.println(formPwdToDBPwd("d3b1294a61a07da9b49b6e22b2cbd7f9","1a2b3c4d"));
+//        System.out.println(inputPwdToDBPwd("123456","1a2b3c4d"));
+    }
 }
