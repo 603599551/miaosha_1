@@ -46,8 +46,10 @@
 **方案2：基于redis缓存的session共享**
 即 用redis来存储所有的session信息，服务器每次读写session都访问redis。
 
-$\color{red}{Q1：在并发量达到一定数量级时，是否需要采用Redis Cluster来存储session？}$
-$\color{red}{Q2：Redis Cluster的应用场景？}$
+<font color=red>
+Q1：在并发量达到一定数量级时，是否需要采用Redis Cluster来存储session？
+Q2：Redis Cluster的应用场景？
+</font>
 
 *****
 
