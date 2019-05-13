@@ -2,9 +2,10 @@ package com.example.demo.config;
 
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.service.MiaoshaUserService;
+import com.sun.istack.internal.Nullable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.MethodParameter;
-import org.springframework.lang.Nullable;
+//import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
