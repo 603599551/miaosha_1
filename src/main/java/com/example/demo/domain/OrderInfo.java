@@ -8,6 +8,7 @@ public class OrderInfo {
 	private Long goodsId;
 	private Long  deliveryAddrId;
 	private String goodsName;
+	//下单的商品数量
 	private Integer goodsCount;
 	private Double goodsPrice;
 	private Integer orderChannel;

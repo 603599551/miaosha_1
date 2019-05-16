@@ -6,11 +6,12 @@ import java.util.Date;
 
 /**
  * @date 2019-05-13
- * 将商品表和秒杀商品表的数据合到一起
+ * 数据对象类：将商品表和秒杀商品表的数据合到一起
  */
 public class GoodsVo extends Goods {
 
     private Double miaoshaPrice;
+    //可秒杀的商品库存
     private Integer stockCount;
     private Date startDate;
     private Date endDate;

@@ -64,14 +64,10 @@ public class MiaoshaUserService {
         if(!StringUtils.equals(calPwd,dbPwd)){
             throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }
-
+        //生成TOKEN
+        String token= UUIDUtil.uuid();
         //生成cookie
-        addCookie(response,user);
-
-        //每次登录成功都要重新设置cookie，并往redis中存KV?
-        //其实没必要，这样会导致一个用户会有多个session，token不一样，但是value都是一样的。
-        //改进方法：在这验证一下token是否存在？存在的话redis中是否有？
-        //如果不存在且没有，那么就调用addCookie()；否则只需要更新相应的KV和cookie的有效期即可
+        addCookie(response,token,user);
 
         return true;
     }
@@ -90,7 +86,7 @@ public class MiaoshaUserService {
         MiaoshaUser user = redisService.get(MiaoshaUserKey.token,token,MiaoshaUser.class);
         //延长cookie和session的有效期
         if (user != null){
-            addCookie(response,user);
+            addCookie(response,token,user);
         }
         return user;
     }
@@ -101,9 +97,7 @@ public class MiaoshaUserService {
      * @param response
      * @param user
      */
-    private void addCookie(HttpServletResponse response,MiaoshaUser user){
-        //生成TOKEN
-        String token= UUIDUtil.uuid();
+    private void addCookie(HttpServletResponse response,String token,MiaoshaUser user){
         //标识token对应着哪个用户，因此需要把token(key)和用户信息(value)写到redis当中
         redisService.set(MiaoshaUserKey.token,token,user);
         //生成cookie

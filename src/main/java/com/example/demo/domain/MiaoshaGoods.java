@@ -5,6 +5,7 @@ import java.util.Date;
 public class MiaoshaGoods {
 	private Long id;
 	private Long goodsId;
+	//可秒杀的库存
 	private Integer stockCount;
 	private Date startDate;
 	private Date endDate;
