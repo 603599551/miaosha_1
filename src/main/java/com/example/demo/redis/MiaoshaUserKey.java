@@ -8,4 +8,7 @@ public class MiaoshaUserKey extends BasePrefix {
     }
 
     public static MiaoshaUserKey token =new MiaoshaUserKey(TOKEN_EXPIRE,"tk");
+    //对象缓存，永久有效
+    public static MiaoshaUserKey getById =new MiaoshaUserKey(0,"id");
+
 }

@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import com.example.demo.dao.MiaoshaUserDao;
+import com.example.demo.domain.MiaoshaOrder;
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.exception.GlobalException;
 import com.example.demo.redis.MiaoshaUserKey;
@@ -33,7 +34,44 @@ public class MiaoshaUserService {
      * @return
      */
     public MiaoshaUser getById(long id){
-        return miaoshaUserDao.getById(id);
+        //优先取缓存
+        MiaoshaUser user = redisService.get(MiaoshaUserKey.getById,""+id,MiaoshaUser.class);
+        if (user != null){
+            return user;
+        }
+        //缓存查不到，就查询数据库
+        user = miaoshaUserDao.getById(id);
+        //放入缓存，过期时间永久
+        if (user != null){
+            redisService.set(MiaoshaUserKey.getById,""+id,user);
+        }
+        return user;
+    }
+
+    /**
+     * 更改账号的密码
+     * @param token
+     * @param id
+     * @param formPass
+     * @return
+     */
+    public boolean updatePassword(String token, long id, String formPass){
+        //取user
+        MiaoshaUser user = getById(id);
+        if (user == null){
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
+        }
+        //更新数据库，修改什么就更新什么，这样可以提高效率
+        MiaoshaUser toBeUpdate = new MiaoshaUser();
+        toBeUpdate.setId(id);
+        toBeUpdate.setPassword(MD5Util.formPassToDbPass(formPass,user.getSalt()));
+        miaoshaUserDao.update(toBeUpdate);
+        //处理token缓存
+        user.setPassword(toBeUpdate.getPassword());
+        redisService.set(MiaoshaUserKey.token,token,user);
+        //@TODO 为啥不更新，是直接删除???
+        redisService.delete(MiaoshaUserKey.getById,""+id);
+        return true;
     }
 
     /**
@@ -60,7 +98,7 @@ public class MiaoshaUserService {
         //验证密码
         String dbPwd=user.getPassword();
         String saltDB=user.getSalt();
-        String calPwd= MD5Util.formPwdToDBPwd(formPwd,saltDB);
+        String calPwd= MD5Util.formPassToDbPass(formPwd,saltDB);
         if(!StringUtils.equals(calPwd,dbPwd)){
             throw new GlobalException(CodeMsg.PASSWORD_ERROR);
         }
@@ -109,4 +147,39 @@ public class MiaoshaUserService {
         response.addCookie(cookie);
     }
 
+    /**
+     * 生成token
+     * @param response
+     * @param loginVo
+     * @return
+     */
+    public String createToken(HttpServletResponse response, LoginVo loginVo) {
+
+        if(loginVo==null){
+            throw new GlobalException(CodeMsg.SERVER_ERROR);
+        }
+
+        String mobile=loginVo.getMobile();
+        String formPwd=loginVo.getPassword();
+
+        //判断手机号是否存在
+        MiaoshaUser user=getById(Long.parseLong(mobile));
+        if(user==null){
+            throw new GlobalException(CodeMsg.MOBILE_NOT_EXIST);
+        }
+
+        //验证密码
+        String dbPwd=user.getPassword();
+        String saltDB=user.getSalt();
+        String calPwd= MD5Util.formPassToDbPass(formPwd,saltDB);
+        if(!StringUtils.equals(calPwd,dbPwd)){
+            throw new GlobalException(CodeMsg.PASSWORD_ERROR);
+        }
+        //生成TOKEN
+        String token= UUIDUtil.uuid();
+        //生成cookie
+        addCookie(response,token,user);
+
+        return token;
+    }
 }

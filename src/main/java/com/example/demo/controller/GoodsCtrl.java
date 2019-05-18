@@ -41,8 +41,12 @@ public class GoodsCtrl {
     ApplicationContext applicationContext;
 
     /**
-     * QPS:660+
+     * 没加页面缓存：
      * 5000并发 * 10次
+     * QPS:660+
+     * 加了页面缓存：
+     * 1000并发 * 10次
+     * QPS:930+
      * @param model
      * @param user
      * @return
@@ -55,10 +59,10 @@ public class GoodsCtrl {
         if(!StringUtils.isEmpty(html)){
             return html;
         }
-        model.addAttribute("user",user);
         //查询商品列表
         List<GoodsVo> goodsList = goodsService.listGoodsVo();
         model.addAttribute("goodsList",goodsList);
+        model.addAttribute("user",user);
         //手动渲染
         SpringWebContext context = new SpringWebContext(request, response,
                 request.getServletContext(),request.getLocale(), model.asMap(), applicationContext);
@@ -78,10 +82,10 @@ public class GoodsCtrl {
         if(!StringUtils.isEmpty(html)){
             return html;
         }
-        model.addAttribute("user",user);
         //查询商品列表
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
         model.addAttribute("goods",goods);
+        model.addAttribute("user",user);
         //秒杀开始时间
         long startAt = goods.getStartDate().getTime();
         //秒杀结束时间
