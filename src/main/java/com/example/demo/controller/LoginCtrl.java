@@ -54,4 +54,18 @@ public class LoginCtrl {
         userService.login(response,loginVo);
         return Result.success(true);
     }
+
+    /**
+     * 生成token--生成大量用户数据
+     * @param response
+     * @param loginVo
+     * @return
+     */
+    @RequestMapping("/create_token")
+    @ResponseBody
+    public String createToken(HttpServletResponse response, @Valid LoginVo loginVo) {
+        log.info(loginVo.toString());
+        String token = userService.createToken(response, loginVo);
+        return token;
+    }
 }

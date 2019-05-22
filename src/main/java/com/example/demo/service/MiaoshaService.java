@@ -33,7 +33,7 @@ public class MiaoshaService {
      */
     @Transactional
     public OrderInfo miaosha(MiaoshaUser user, GoodsVo goods) {
-        //减库存
+        //减库存 @TODO 为什么减库存失败时不直接return，而是等到写入秒杀订单的时候通过唯一性来判断是否成功？
         goodsService.reduceStock(goods);
         //下订单->写入秒杀订单
         return orderService.createOrder(user,goods);

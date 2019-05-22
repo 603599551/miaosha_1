@@ -3,8 +3,10 @@ package com.example.demo.controller;
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.redis.GoodsKey;
 import com.example.demo.redis.RedisService;
+import com.example.demo.result.Result;
 import com.example.demo.service.GoodsService;
 import com.example.demo.service.MiaoshaUserService;
+import com.example.demo.vo.GoodsDetailVo;
 import com.example.demo.vo.GoodsVo;
 import org.springframework.context.ApplicationContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,19 +75,13 @@ public class GoodsCtrl {
         return html;
     }
 
-    @RequestMapping(value = "/to_detail/{goodsId}", produces = "text/html")
+    //页面静态化的情况
+    @RequestMapping(value = "/detail/{goodsId}")
     @ResponseBody
-    public String toDetail(HttpServletRequest request, HttpServletResponse response,Model model,
-                           MiaoshaUser user, @PathVariable("goodsId")long goodsId){
-        //先取缓存
-        String html = redisService.get(GoodsKey.getGoodsDetail,""+goodsId,String.class);
-        if(!StringUtils.isEmpty(html)){
-            return html;
-        }
+    public Result<GoodsDetailVo> toDetail(HttpServletRequest request, HttpServletResponse response, Model model,
+                                          MiaoshaUser user, @PathVariable("goodsId")long goodsId){
         //查询商品列表
         GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
-        model.addAttribute("goods",goods);
-        model.addAttribute("user",user);
         //秒杀开始时间
         long startAt = goods.getStartDate().getTime();
         //秒杀结束时间
@@ -110,15 +106,62 @@ public class GoodsCtrl {
             remainSeconds = 0;
         }
 
-        model.addAttribute("miaoshaStatus",miaoshaStatus);
-        model.addAttribute("remainSeconds",remainSeconds);
-        //手动渲染
-        SpringWebContext context = new SpringWebContext(request, response,
-                request.getServletContext(),request.getLocale(), model.asMap(), applicationContext);
-        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", context);
-        if(!StringUtils.isEmpty(html)){
-            redisService.set(GoodsKey.getGoodsDetail,""+goodsId,html);
-        }
-        return html;
+        GoodsDetailVo vo =new GoodsDetailVo();
+        vo.setGoods(goods);
+        vo.setUser(user);
+        vo.setRemainSeconds(remainSeconds);
+        vo.setMiaoshaStatus(miaoshaStatus);
+        return Result.success(vo);
+
     }
+
+    //页面非静态化的情况
+//    @RequestMapping(value = "/to_detail2/{goodsId}", produces = "text/html")
+//    @ResponseBody
+//    public String toDetail2(HttpServletRequest request, HttpServletResponse response,Model model,
+//                           MiaoshaUser user, @PathVariable("goodsId")long goodsId){
+//        //先取缓存
+//        String html = redisService.get(GoodsKey.getGoodsDetail,""+goodsId,String.class);
+//        if(!StringUtils.isEmpty(html)){
+//            return html;
+//        }
+//        //查询商品列表
+//        GoodsVo goods = goodsService.getGoodsVoByGoodsId(goodsId);
+//        model.addAttribute("goods",goods);
+//        model.addAttribute("user",user);
+//        //秒杀开始时间
+//        long startAt = goods.getStartDate().getTime();
+//        //秒杀结束时间
+//        long endAt = goods.getEndDate().getTime();
+//        //现在时间
+//        long now = System.currentTimeMillis();
+//
+//        //秒杀状态
+//        int miaoshaStatus = 0;
+//        //距离秒杀开始的时间 （s）
+//        int remainSeconds = 0;
+//
+//
+//        if(now < startAt){//秒杀还没开始，倒计时
+//            miaoshaStatus = 0;
+//            remainSeconds = (int)(startAt - now)/1000;
+//        }else if(now > endAt){//秒杀已经结束
+//            miaoshaStatus = 2;
+//            remainSeconds = -1;
+//        }else{//秒杀进行中
+//            miaoshaStatus = 1;
+//            remainSeconds = 0;
+//        }
+//
+//        model.addAttribute("miaoshaStatus",miaoshaStatus);
+//        model.addAttribute("remainSeconds",remainSeconds);
+//        //手动渲染
+//        SpringWebContext context = new SpringWebContext(request, response,
+//                request.getServletContext(),request.getLocale(), model.asMap(), applicationContext);
+//        html = thymeleafViewResolver.getTemplateEngine().process("goods_detail", context);
+//        if(!StringUtils.isEmpty(html)){
+//            redisService.set(GoodsKey.getGoodsDetail,""+goodsId,html);
+//        }
+//        return html;
+//    }
 }

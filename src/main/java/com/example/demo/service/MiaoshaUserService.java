@@ -69,7 +69,7 @@ public class MiaoshaUserService {
         //处理token缓存
         user.setPassword(toBeUpdate.getPassword());
         redisService.set(MiaoshaUserKey.token,token,user);
-        //@TODO 为啥不更新，是直接删除???
+        //让缓存失效
         redisService.delete(MiaoshaUserKey.getById,""+id);
         return true;
     }

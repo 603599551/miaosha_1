@@ -5,6 +5,8 @@ import com.example.demo.dao.OrderDao;
 import com.example.demo.domain.MiaoshaOrder;
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.domain.OrderInfo;
+import com.example.demo.redis.OrderKey;
+import com.example.demo.redis.RedisService;
 import com.example.demo.result.CodeMsg;
 import com.example.demo.vo.GoodsVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,23 @@ public class OrderService {
     @Autowired
     OrderDao orderDao;
 
+    @Autowired
+    RedisService redisService;
 
-    public MiaoshaOrder getMiaoshaOrderByUserIdGoodsId(long id, long goodsId) {
+    /**
+     * 查询缓存，看是否有对应的秒杀订单
+     * @param userId
+     * @param goodsId
+     * @return
+     */
+    public MiaoshaOrder getMiaoshaOrderByUserIdGoodsId(long userId, long goodsId) {
 
-        return orderDao.getMiaoshaOrderByUserIdGoodsId(id,goodsId);
+//        return orderDao.getMiaoshaOrderByUserIdGoodsId(id,goodsId);
+        return redisService.get(OrderKey.getMiaoshaOrderByUidGid,""+userId+"_"+goodsId,MiaoshaOrder.class);
+    }
+
+    public OrderInfo getOrderById(long orderId) {
+        return orderDao.getOrderById(orderId);
     }
 
     /**
@@ -45,7 +60,7 @@ public class OrderService {
         orderInfo.setGoodsId(goods.getId());
         orderInfo.setGoodsName(goods.getGoodsName());
         orderInfo.setGoodsPrice(goods.getMiaoshaPrice());
-        //暂时简写1 @TODO 秒杀的渠道：android / ios / pc ? 如何判断??
+        //暂时简写1  判断秒杀的渠道：android / ios / pc
         orderInfo.setOrderChannel(1);
         //订单状态：0新建未支付，1待发货，2已发货，3已收货，4已退款，5已完成 @TODO 用枚举类型表示一下
         orderInfo.setStatus(0);
@@ -64,6 +79,11 @@ public class OrderService {
         miaoshaOrder.setUserId(user.getId());
         orderDao.insertMiaoshaOrder(miaoshaOrder);
 
+        //下单成功后，把秒杀订单放到缓存中
+        redisService.set(OrderKey.getMiaoshaOrderByUidGid,""+user.getId()+"_"+goods.getId(),miaoshaOrder);
+
         return orderInfo;
     }
+
+
 }
