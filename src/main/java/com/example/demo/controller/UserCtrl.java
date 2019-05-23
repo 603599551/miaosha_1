@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import com.example.demo.domain.MiaoshaOrder;
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.domain.OrderInfo;
+import com.example.demo.rabbitmq.MQSender;
 import com.example.demo.redis.RedisService;
 import com.example.demo.result.CodeMsg;
 import com.example.demo.result.Result;
@@ -19,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/mq")
 public class UserCtrl {
 
     @Autowired
@@ -37,9 +38,34 @@ public class UserCtrl {
     @Autowired
     MiaoshaService miaoshaService;
 
-    @RequestMapping("/info")
+    @Autowired
+    MQSender sender;
+
+    @RequestMapping("/direct")
     @ResponseBody
-    public Result<MiaoshaUser> info(Model model, MiaoshaUser user){
-        return Result.success(user);
+    public Result<String> info(){
+        sender.sendDirect("hello");
+        return Result.success("hello world");
+    }
+
+    @RequestMapping("/topic")
+    @ResponseBody
+    public Result<String> topic(){
+        sender.sendTopic("hello,topic");
+        return Result.success("hello topic");
+    }
+
+    @RequestMapping("/fanout")
+    @ResponseBody
+    public Result<String> fanout(){
+        sender.sendFanout("hello,fanout");
+        return Result.success("hello fanout");
+    }
+
+    @RequestMapping("/headers")
+    @ResponseBody
+    public Result<String> headers(){
+        sender.sendHeaders("hello,headers");
+        return Result.success("hello headers");
     }
 }
