@@ -20,6 +20,14 @@ import java.util.List;
 @Service
 public class OrderService {
 
+    //订单状态：0新建未支付，1待发货，2已发货，3已收货，4已退款，5已完成
+    public static final int NOT_PAID = 0;
+    public static final int NOT_SHIPPED = 1;
+    public static final int HAVE_SHIPPED = 2;
+    public static final int HAVE_RECEIVED = 3;
+    public static final int HAVE_REFUNDED = 4;
+    public static final int HAVE_FINISHED = 5;
+
 
     @Autowired
     OrderDao orderDao;
@@ -62,20 +70,16 @@ public class OrderService {
         orderInfo.setGoodsPrice(goods.getMiaoshaPrice());
         //暂时简写1  判断秒杀的渠道：android / ios / pc
         orderInfo.setOrderChannel(1);
-        //订单状态：0新建未支付，1待发货，2已发货，3已收货，4已退款，5已完成 @TODO 用枚举类型表示一下
-        orderInfo.setStatus(0);
+        //订单状态：0新建未支付，1待发货，2已发货，3已收货，4已退款，5已完成
+        orderInfo.setStatus(NOT_PAID);
         orderInfo.setUserId(user.getId());
         //生成订单,返回1表示插入成功 ，0表示失败
-        long orderId = orderDao.insert(orderInfo);
-        if (orderId == 1){
-            orderId = orderInfo.getId();
-        }else{
-            return null;
-        }
+        long flag = orderDao.insert(orderInfo);
+        if (flag == 0) return null;
 
         MiaoshaOrder miaoshaOrder = new MiaoshaOrder();
         miaoshaOrder.setGoodsId(goods.getId());
-        miaoshaOrder.setOrderId(orderId);
+        miaoshaOrder.setOrderId(orderInfo.getId());
         miaoshaOrder.setUserId(user.getId());
         orderDao.insertMiaoshaOrder(miaoshaOrder);
 
