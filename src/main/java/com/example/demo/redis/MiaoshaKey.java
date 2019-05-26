@@ -3,6 +3,7 @@ package com.example.demo.redis;
 public class MiaoshaKey extends BasePrefix {
 
 
+
     private MiaoshaKey(String prefix) {
         super(prefix);
     }
@@ -12,5 +13,7 @@ public class MiaoshaKey extends BasePrefix {
     }
 
     public static MiaoshaKey isGoodOver=new MiaoshaKey("go");
+    public static MiaoshaKey getMiaoshaPath=new MiaoshaKey(60,"mp");
+    public static MiaoshaKey getMiaoshaVerifyCode=new MiaoshaKey(300,"vc");
 
 }

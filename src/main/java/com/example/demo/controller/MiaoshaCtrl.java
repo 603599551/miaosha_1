@@ -6,6 +6,7 @@ import com.example.demo.domain.OrderInfo;
 import com.example.demo.rabbitmq.MQSender;
 import com.example.demo.rabbitmq.MiaoshaMessage;
 import com.example.demo.redis.GoodsKey;
+import com.example.demo.redis.MiaoshaKey;
 import com.example.demo.redis.RedisService;
 import com.example.demo.result.CodeMsg;
 import com.example.demo.result.Result;
@@ -13,6 +14,8 @@ import com.example.demo.service.GoodsService;
 import com.example.demo.service.MiaoshaService;
 import com.example.demo.service.MiaoshaUserService;
 import com.example.demo.service.OrderService;
+import com.example.demo.util.MD5Util;
+import com.example.demo.util.UUIDUtil;
 import com.example.demo.vo.GoodsVo;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +23,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.imageio.ImageIO;
+import javax.servlet.http.HttpServletResponse;
+import java.awt.image.BufferedImage;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,9 +34,6 @@ import java.util.Map;
 @Controller
 @RequestMapping("/miaosha")
 public class MiaoshaCtrl implements InitializingBean{
-
-    @Autowired
-    MiaoshaUserService userService;
 
     @Autowired
     RedisService redisService;
@@ -65,21 +69,27 @@ public class MiaoshaCtrl implements InitializingBean{
     }
 
     /**
-     * QPS:546
      * 5000并发 * 10次
+     * 优化之前QPS:546
+     * 优化之后QPS:2100+
      * @param model
      * @param user
      * @param goodsId
      * @return
      */
-    @RequestMapping(value = "/do_miaosha", method = RequestMethod.POST)
+    @RequestMapping(value = "/{path}/do_miaosha", method = RequestMethod.POST)
     @ResponseBody
     public Result<Integer> doMiaosha(Model model, MiaoshaUser user,
-                                    @RequestParam("goodsId")long goodsId){
+                                     @RequestParam("goodsId")long goodsId,
+                                     @PathVariable("path")String path){
         model.addAttribute("user",user);
         if(user == null){
             return Result.error(CodeMsg.SESSION_ERROR);
         }
+
+        //验证秒杀地址path是否正确
+        boolean flag = miaoshaService.checkPath(user, goodsId, path);
+        if (!flag) return Result.error(CodeMsg.REQUEST_ILLEGAL);
 
         //map标记，减少对Redis的访问
         boolean isOver = localOverMap.get(goodsId);
@@ -145,4 +155,53 @@ public class MiaoshaCtrl implements InitializingBean{
     }
 
 
+    /**
+     * 获取秒杀地址 -- 随机生成的path
+     * @param model
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaPath(Model model, MiaoshaUser user,
+                                     @RequestParam("goodsId")long goodsId,
+                                         @RequestParam("verifyCode")int verifyCode) {
+        model.addAttribute("user", user);
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        //验证验证码的结果是否正确
+        boolean flag = miaoshaService.checkVerifyCode(user, goodsId, verifyCode);
+        if(!flag) return Result.error(CodeMsg.REQUEST_ILLEGAL);
+        String path = miaoshaService.createMiaoshaPath(user, goodsId);
+        return Result.success(path);
+    }
+
+    /**
+     * 生成图片验证码
+     * @param user
+     * @param goodsId
+     * @return
+     */
+    @RequestMapping(value = "/verifyCode", method = RequestMethod.GET)
+    @ResponseBody
+    public Result<String> getMiaoshaVerifyCode(HttpServletResponse response, MiaoshaUser user,
+                                               @RequestParam("goodsId")long goodsId) {
+        if (user == null) {
+            return Result.error(CodeMsg.SESSION_ERROR);
+        }
+        try {
+            BufferedImage image = miaoshaService.createVerifyCode(user, goodsId);
+            //数据在这里返回了，因此后面是return null
+            OutputStream out = response.getOutputStream();
+            ImageIO.write(image, "JPEG", out);
+            out.flush();
+            out.close();
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            return Result.error(CodeMsg.MIAOSHA_FAIL);
+        }
+    }
 }
