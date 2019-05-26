@@ -1,5 +1,6 @@
 package com.example.demo.config;
 
+import com.example.demo.access.UserContext;
 import com.example.demo.domain.MiaoshaUser;
 import com.example.demo.service.MiaoshaUserService;
 import com.sun.istack.internal.Nullable;
@@ -41,7 +42,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     /**
-     * 解析登录请求的参数
+     * 调用该方法前，拦截器已经验证登录，将user对象保存到每个线程的本地变量中，因此可以直接获取。
      * @param methodParameter
      * @param modelAndViewContainer
      * @param nativeWebRequest
@@ -49,38 +50,27 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
      * @return
      * @throws Exception
      */
-    @Nullable
     @Override
-    public Object resolveArgument(MethodParameter methodParameter, @Nullable ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, @Nullable WebDataBinderFactory webDataBinderFactory) throws Exception {
-        HttpServletRequest request = nativeWebRequest.getNativeRequest(HttpServletRequest.class);
-        HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-
-        String paramToken = request.getParameter(MiaoshaUserService.COOKIE_NAME_TOKEN);
-        String cookieToken = getCookieValue(request,MiaoshaUserService.COOKIE_NAME_TOKEN);
-        if(StringUtils.isEmpty(cookieToken)&&StringUtils.isEmpty(paramToken)){
-            return null;
-        }
-
-        String token = StringUtils.isEmpty(paramToken)? cookieToken:paramToken;
-        return userService.getByToken(response,token);
+    public Object resolveArgument(MethodParameter methodParameter, ModelAndViewContainer modelAndViewContainer, NativeWebRequest nativeWebRequest, WebDataBinderFactory webDataBinderFactory) throws Exception {
+        return UserContext.getUser();
     }
 
-    /**
-     * 获取request-cookies中的token
-     * @param request
-     * @param cookieNameToken
-     * @return
-     */
-    private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
-        Cookie[] cookies = request.getCookies();
-        if(cookies == null || cookies.length == 0){
-            return null;
-        }
-        for (Cookie cookie : cookies){
-            if(cookie.getName().equals(cookieNameToken)){
-                return cookie.getValue();
-            }
-        }
-        return null;
-    }
+//    /**
+//     * 获取request-cookies中的token
+//     * @param request
+//     * @param cookieNameToken
+//     * @return
+//     */
+//    private String getCookieValue(HttpServletRequest request, String cookieNameToken) {
+//        Cookie[] cookies = request.getCookies();
+//        if(cookies == null || cookies.length == 0){
+//            return null;
+//        }
+//        for (Cookie cookie : cookies){
+//            if(cookie.getName().equals(cookieNameToken)){
+//                return cookie.getValue();
+//            }
+//        }
+//        return null;
+//    }
 }

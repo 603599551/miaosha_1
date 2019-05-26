@@ -8,6 +8,8 @@ public class CodeMsg {
     public static CodeMsg SUCCESS=new CodeMsg(0,"success");
     public static CodeMsg SERVER_ERROR =new CodeMsg(500100,"server error");
     public static CodeMsg BIND_ERROR =new CodeMsg(500101,"参数校验异常:%s");
+    public static CodeMsg REQUEST_ILLEGAL =new CodeMsg(500102,"请求非法");
+    public static CodeMsg ACCESS_TIMES_LIMIT =new CodeMsg(500103,"访问太频繁");
 
     //登录模块 5002XX
     public static CodeMsg SESSION_ERROR=new CodeMsg(500210,"session不存在或已失效");
@@ -25,6 +27,7 @@ public class CodeMsg {
     //秒杀模块 5005XX
     public static CodeMsg MIAOSHA_OVER=new CodeMsg(500500,"商品已经秒杀完毕");
     public static CodeMsg REPEAT_MIAOSHA_ERROR=new CodeMsg(500501,"商品不能重复秒杀");
+    public static CodeMsg MIAOSHA_FAIL=new CodeMsg(500502,"商品秒杀失败");
 
     private CodeMsg(int code,String msg){
         this.code=code;
