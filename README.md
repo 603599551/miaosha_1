@@ -56,8 +56,8 @@ Q5：GET和POST方法的区别 详解
 Q6：HTTP中的缓存控制开关Pragma 和 Cache-Control -- https://blog.csdn.net/u012375924/article/details/82806617
 Q7：秒杀优化
     Nginx水平扩展--安装Nginx、反向代理、负载均衡
-    百万级并发 客户端->Nginx->Tomcat
-    千万级并发 客户端->LVS->Nginx->Tomcat
+    百万级并发方案：客户端->Nginx->Tomcat
+    千万级并发方案：客户端->LVS->Nginx->Tomcat
 
 
 

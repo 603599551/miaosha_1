@@ -187,7 +187,7 @@
  -- 3、分库分表带来的问题
  -- 4、什么时候需要做数据切分
  -- 5、案例分析
- -- 6、支持分库分表的中间件
+ -- 6、支持分库分表的中间件（如阿里Mycat）
  ```
 <a href="https://mp.weixin.qq.com/s?__biz=MzU2MTI4MjI0MQ==&mid=2247486361&idx=2&sn=54a666b5ff5398ea1062fe1ab9a446b1&chksm=fc7a6637cb0def211e37176547cc072b5d57dba2a49b3ba42c6face9543435587265bb609566&mpshare=1&scene=1&srcid=&key=aba27b4d9f74947f227b57b2b825d4184225b0e3a5014deed0a7ac0bf9d57e0e0fd7a09e074a444ca88deabb2299fd989503f75d49f5a4f12477a9d8a5488f5c0e54bbdab9ec6b68ee664a64261ead9d&ascene=1&uin=MjUxNDc0NDk4MA%3D%3D&devicetype=Windows+10&version=6206081f&lang=zh_CN&pass_ticket=MXiR9TZrde3Emj6nTSSkvehiNCqMqUqhfpfBPHgx7OlcnuuTdroZCosNEOeSrSxE
 ">“数据库分库分表”详解</a>
