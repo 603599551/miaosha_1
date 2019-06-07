@@ -188,7 +188,6 @@
  -- 4、什么时候需要做数据切分
  -- 5、案例分析
  -- 6、支持分库分表的中间件
- -- 
  ```
 <a href="https://mp.weixin.qq.com/s?__biz=MzU2MTI4MjI0MQ==&mid=2247486361&idx=2&sn=54a666b5ff5398ea1062fe1ab9a446b1&chksm=fc7a6637cb0def211e37176547cc072b5d57dba2a49b3ba42c6face9543435587265bb609566&mpshare=1&scene=1&srcid=&key=aba27b4d9f74947f227b57b2b825d4184225b0e3a5014deed0a7ac0bf9d57e0e0fd7a09e074a444ca88deabb2299fd989503f75d49f5a4f12477a9d8a5488f5c0e54bbdab9ec6b68ee664a64261ead9d&ascene=1&uin=MjUxNDc0NDk4MA%3D%3D&devicetype=Windows+10&version=6206081f&lang=zh_CN&pass_ticket=MXiR9TZrde3Emj6nTSSkvehiNCqMqUqhfpfBPHgx7OlcnuuTdroZCosNEOeSrSxE
 ">“数据库分库分表”详解</a>
@@ -281,3 +280,59 @@
  -- 9.若第8步的减库存失败，则会在Redis缓存中标记该商品已售罄，并return false。
  -- 10.客户端在收到响应“排队中”后，会轮询服务端的Redis缓存（判断是否存在秒杀订单/是否售罄），直到秒杀成功或失败。（排队中0 成功orderId 失败-1）
  ```
+
+#### <font color=#6495ED face="黑体">28.templates和static的区别？</font> 
+```
+ -- static中放静态页面，静态页面可以通过根目录直接访问，也可以通过Controller跳转，例如/hello.html 访问的是static包下的hello.html；
+    当pom.xml未引入thymeleaf组件时，访问静态页面的Controller的return默认是跳转到/static/index.html，
+ -- 而templates中放动态页面，动态页面需要先请求服务器，访问后台应用程序，然后再转向到Thymeleaf页面。
+    当pom.xml引入了thymeleaf组件，动态跳转会覆盖默认的静态跳转，默认就会跳转到/templates/index.html，
+    在Controller中通过函数return的字符串再加上默认的前后缀（spring.thymeleaf.prefix/suffix），就可以映射thymeleaf的资源。
+ -- 无论是否引入了thymeleaf组件，在html中访问根目录，默认访问的是/static。
+ ```
+<a href=" https://blog.csdn.net/wangb_java/article/details/71775637">templates和static的应用实例</a>
+ 
+#### <font color=#6495ED face="黑体">29.项目的多线程和高并发体现在哪里？</font> 
+```
+ -- 首先我们采用了JMeter工具模拟多线程对系统进行了压测，因此不需要在代码中写“创建多线程”的代码。
+ -- 其次我们采用了Redis预减库存的方式来解决超卖问题，因此不需要加锁并且不加锁的效率会更高。
+ 
+ -- “多线程!=高并发”
+    高并发是一种系统运行过程中遇到的一种“短时间内遇到大量操作请求”的情况，该情况的发生会导致系统在这段时间内执行大量操作，例如对资源的请求，数据库的操作等。
+    如果想要系统能够适应高并发状态，则需要从各个方面进行系统优化，包括，硬件、网络、系统架构、开发语言的选取、数据结构的运用、算法优化、数据库优化等……
+    而多线程只是其中解决方法之一。
+ ```
+ 
+#### <font color=#6495ED face="黑体">30.四种交换机exchange模式（direct、topic、fanout、headers）？</font> 
+```
+ -- RabbitMQ消息模型的核心思想: 
+    生产者会把消息发送给RabbitMQ的交换机（Exchange），
+    交换机的一侧是生产者，另一侧则是一个或多个队列，由交换机决定一条消息的生命周期，发送给某些队列，或者直接丢弃掉。
+    消费者会从队列中获取未被读取的数据处理。
+ ```
+<a href="https://www.jianshu.com/p/469f4608ce5d">交换机模式详解</a>
+ 
+#### <font color=#6495ED face="黑体">31.thymeleaf和“页面静态化、前后端分离”的区别？</font> 
+```
+ -- thymeleaf实际上是动态的，即在服务端用数据渲染模板后将整个页面发给客户端；
+ -- “页面静态化，前后端分离”：将静态页面纯html缓存在客户端，通过js和ajax请求服务端获取数据来渲染页面，这样客户端每次只需要从服务端获取动态部分的数据。
+ ```
+
+#### <font color=red face="黑体">32.如何优化页面，从而提高性能？（3、4步待实现）</font> 
+```
+ -- 1.页面缓存+对象缓存（减少对数据库的访问）
+    页面缓存的应用场景：短时间内变化不大的页面，如商品列表。在实际项目中，商品列表一般是分页的，我们一般只缓存前一两页。
+    对象缓存的有效时间是永久，当对象的信息发生改变时要及时更新缓存，如用户信息对象。
+ -- 2.页面静态化，前后端分离。
+ -- 3.静态资源优化
+    JS/CSS压缩（去掉多余的空格和字符），减少流量 （中间件webpack）
+    组合多个JS/CSS文件的访问请求变成一个请求 （中间件tengine web server）
+ -- 4.内容分发网络CDN ：就近访问服务节点
+ -- 页面优化总结：
+    用户发起请求时，浏览器通过页面静态化将页面缓存在浏览器端；
+    请求到达服务端之前，我们可以部署一些CDN节点，让请求先访问我们CDN；
+    通过CDN访问nginx缓存，再到应用程序的页面缓存，对象缓存，最后访问到数据库；
+    通过一层层的访问缓存，逐步削减到达数据库的请求数量，这样才能保证网站在高并发的情况下抗住压力。
+ ```
+ 
+ 
