@@ -48,16 +48,15 @@ ID | Module | Problem
 <a href="https://github.com/603599551/miaosha_1/blob/master/code-solve.md">以上问题的详解</a>
 
 **未解决的问题**
-Q1：在并发量达到一定数量级时，是否需要采用Redis Cluster来存储session？
-Q2：Redis Cluster的应用场景？
-Q3：该项目应该拓展成分布式，那么会涉及到很多问题，比如分布式事务？
-Q4：Redis并发数达到一定时，为什么会使value为null？
-Q5：GET和POST方法的区别 详解
-Q6：HTTP中的缓存控制开关Pragma 和 Cache-Control -- https://blog.csdn.net/u012375924/article/details/82806617
-Q7：秒杀优化
-    Nginx水平扩展--安装Nginx、反向代理、负载均衡
-    百万级并发方案：客户端->Nginx->Tomcat
-    千万级并发方案：客户端->LVS->Nginx->Tomcat
+Q1：在并发量达到一定数量级时，是否需要采用Redis Cluster来存储session？  
+Q2：Redis Cluster的应用场景？  
+Q3：该项目应该拓展成分布式，那么会涉及到很多问题，比如分布式事务？  
+Q4：Redis并发数达到一定时，为什么会使value为null？  
+Q7：秒杀优化  
+    Nginx水平扩展--安装Nginx、反向代理、负载均衡  
+    百万级并发方案：客户端->Nginx->Tomcat  
+    千万级并发方案：客户端->LVS->Nginx->Tomcat  
+Q9：回顾大神的总结 1博客1github  
 
 
 
